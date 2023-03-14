@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <!-- CSS only -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous"> -->
+    <title>inventory</title>
+    <style>
+        :root {
+            --green: #babd8e;
+            --dark-green: #2b3928;
+            --light-yellow: #ffefcd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            box-sizing: border-box;
+        }
+
+        .form button {
+            width: 100px;
+            height: 30px;
+        }
+
+        .form {
+            width: 500px;
+            height: fit-content;
+            text-align: center;
+            /* display:flex;
+            justify-content:center; */
+            margin: 10px auto;
+            background-color: #f1f5f9;
+            box-sizing: border-box;
+
+        }
+
+        .form .form_group {
+            display: flex;
+            justify-content: right;
+            padding: 5px;
+
+        }
+
+        .form label {
+            padding: 0 10px;
+            width: 30%;
+            font-size: 1.2em;
+            color: var(--dark-green);
+
+        }
+
+        .form input {
+            width: 70%;
+            height: 30px;
+            font-size: 1.1em;
+        }
+
+        .form div {
+            margin: 20px;
+        }
+
+        .form button {
+            margin: 10px;
+            font-size: 1.1em;
+            padding: 5px;
+            width: 100px;
+            height: 50px;
+        }
+
+        .form img {
+            width: 100px;
+            height: 100px;
+        }
+
+        #table .title {
+            background-color: var(--green);
+            border-right: var(--green) solid 1px;
+            color: var(--dark-green);
+        }
+
+        table {
+            width: 80%;
+            height: fit-content;
+            border: var(--dark-green) 2px solid;
+            background-color: var(--light-yellow);
+            color: var(--dark-green);
+            border-collapse: collapse;
+            border-spacing: 0.5rem;
+            text-align: center;
+            margin: 5px auto;
+            font-size: 1.5em;
+            box-sizing: border-box;
+        }
+
+        #table thead {
+            border-color: var(--green);
+        }
+
+        table button {
+            background: none;
+            color: var(--dark-green);
+            display: inline-flex;
+            justify-content: space-around;
+            /* border-radius: 40px; */
+            border: none;
+            padding: 15px;
+            margin: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+
+        th,
+        td {
+            border: #2b3928 2px solid;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="form">
+        <div class="form_group">
+            <label for="id">ID</label>
+            <input type="number" id="id" class="form_input">
+            <div class="error_message"></div>
+        </div>
+        <div class="form_group">
+            <label for="image">Image</label>
+            <input type="file" id="image" class="form_input">
+            <img src="" alt="" id="preview">
+            <div class="error_message"></div>
+        </div>
+        <div class="form_group">
+            <label for="title">Name</label>
+            <input type="text" id="title" class="form_input">
+            <div class="error_message"></div>
+        </div>
+        <div class="form_group">
+            <label for="title" multiple onchange="validateSelect(this)">Category</label>
+            <select name="" id="category">
+                <option value="">Select option</option>
+                <option value="indoor">Indoor</option>
+                <option value="outdoor">Outdoor</option>
+            </select>
+            <div class="error_message"></div>
+        </div>
+        <div class="form_group">
+            <label for="cost">Cost </label>
+            <input type="text" id="cost" class="form_input">
+            <div class="error_message"></div>
+        </div>
+        <button id="btn" onclick="add()">Add New</button>
+    </form>
+
+    <table class="table" id="table">
+        
+    </table>
+</body>
+<script >
+    //import {product} from "./data.js";
+
+    function createProduct() {
+        localStorage.setItem('product', JSON.stringify(product));
+    }
+
+    if (localStorage.getItem('product') == null) {
+        createProduct(product);
+    }
+
+    function showProductList() {
+        if (localStorage.getItem('product') == null) {
+            return false;
+        }
+        var productArr = JSON.parse(localStorage.getItem('product'));
+        var table = ` <thead>
+             <tr>
+                <th class="title">ID</th>
+                <th class="title">Image</th>
+                <th class="title">Name</th>
+                <th class="title">Category</th>
+                <th class="title">Cost</th>
+                <th class="title">Action</th>
+            </tr> 
+        </thead>`
+        for (let i = 0; i < productArr.length; i++) {
+            table +=
+
+                '<tr><td>' + (i + 1) + '</td><td><img src="' + productArr[i].image + '" width=100px , height=130px></td><td>' + productArr[i].title + '</td><td>' + productArr[i].category + '</td> <td>' + productArr[i].cost + '</td><th><button onclick="deleteItem(\'' + productArr[i].id + '\')"><i class="fa-solid fa-delete-left"></i><button onclick="editItem(\'' + productArr[i].id + '\')"><i class="fa-solid fa-pen-to-square"></i></th></tr>'
+            
+        }
+
+        document.getElementById('table').innerHTML = table;
+    }
+    // var item_id = document.getElementById('id').value;
+    // var item_title = document.getElementById('title').value;
+    // var item_image = document.getElementById('image').value;
+    // var item_cost = document.getElementById('cost').value;
+    var arrImg = [];
+function changeImg() {
+  document.querySelector("#image").addEventListener("change", function () {
+    var reader = new FileReader();
+    reader.addEventListener("load", function listen() {
+      // localStorage.setItem("recent-img", reader.result);
+      if (arrImg.includes(reader.result) == false) {
+        arrImg.push(reader.result);
+      }
+    });
+    reader.readAsDataURL(this.files[0]);
+  });}
+  changeImg();
+
+    function add() {
+        validate_form();
+        let productArr = JSON.parse(localStorage.getItem('product'));
+
+        var item =
+        {
+            id: document.getElementById('id').value,
+            image: document.getElementById('preview').attributes['src'].value,
+            title: document.getElementById('title').value,
+            category: document.getElementById('category').value,
+            cost: document.getElementById('cost').value,
+        };
+
+        let index = productArr.findIndex((c) => c.id == item.id)
+
+        if (index >= 0) {
+            productArr.splice(index, 1, item)
+        } else {
+            data.push(item);
+        }
+
+        console.log(item);
+        console.log(productArr);
+        
+        localStorage.setItem('product', JSON.stringify(productArr))
+        showProductList();
+        // clear()
+    }
+    function clear() {
+        document.getElementById('id').value = "";
+        document.getElementById('image').value = "";
+        document.getElementById('title').value = "";
+        document.getElementById('category').value = "";
+        document.getElementById('cost').value = "";
+    }
+
+    //xoa han cai san pham
+
+    function deleteItem(IDproductDel) {
+        var productArray = JSON.parse(localStorage.getItem('product'));
+        for (let i = 0; i < productArray.length; i++) {
+            if (productArray[i].id == IDproductDel)
+                if (
+                    confirm(
+                        "Are you sure you want to delete this product?"
+                    )
+                ) {
+                    //ham xoa phan tu
+                    productArray.splice(i, 1);
+                }
+            
+
+        }
+        localStorage.setItem('product', JSON.stringify(productArray));
+        showProductList(productArray)
+    }
+
+    function validateSelect(obj){
+        var options = obj.children;
+        for (var i = 0; i < options.length; i++){
+            if (options[i].selected){
+                document.getElementById('category').value = options[i].value; 
+            }
+        }
+    }
+
+    function editItem(id) {
+        var productArray = JSON.parse(localStorage.getItem('product'));
+        document.getElementById('btn').innerText = "Update";
+        for (let i = 0; i < productArray.length; i++) {
+            if (productArray[i].id == id) {
+                // gán giá trị trong mảng đó cho giá trị sửa
+                document.getElementById('id').value = productArray[i].id;
+                document.getElementById('preview').attributes['src'].value = productArray[i].image;//lay link anh
+                document.getElementById('title').value = productArray[i].title;
+                document.getElementById('category').value= productArray[i].category;
+                document.getElementById('cost').value = productArray[i].cost;
+            }
+        }
+        validate_form();
+        localStorage.setItem('product', JSON.stringify(productArray));
+        showProductList(productArray);
+    }
+    function validate_form() {
+        let formElement = document.querySelector(".form");
+        let inputElement = formElement.querySelectorAll(".form_group");
+
+        for (let i = 0; i < inputElement.length; i++) {
+            if (inputElement[i].value == "") {
+                inputElement[i].parentElement.querySelector(
+                    ".error_message"
+                ).innerHTML = `Please enter Product's ${inputElement[i].id}`;
+            }
+        }
+    }
+
+    window.onload = function () {
+        let productArray = JSON.parse(localStorage.getItem('product'));
+        deleteItem(productArray);
+        //editItem(productArray);
+        //createProduct(productArray);
+        showProductList(productArray);
+    }
+</script>
+<!-- <script type="module"
+src="../js/productManeger.js"></script> -->
+</html>
